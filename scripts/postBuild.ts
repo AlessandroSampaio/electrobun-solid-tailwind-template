@@ -7,14 +7,17 @@ const esbuild = require('esbuild');
 const { solidPlugin } = require('esbuild-plugin-solid');
 
 const { ELECTROBUN_BUILD_DIR, ELECTROBUN_APP_NAME } = process.env;
+const platform = process.platform;
 
-const APP_BUNDLE_FOLDER = path.join(
-  ELECTROBUN_BUILD_DIR!,
-  `${ELECTROBUN_APP_NAME}.app`,
-);
+const APP_BUNDLE_FOLDER =
+  platform === 'win32'
+    ? path.join(ELECTROBUN_BUILD_DIR!, ELECTROBUN_APP_NAME!)
+    : path.join(ELECTROBUN_BUILD_DIR!, `${ELECTROBUN_APP_NAME}.app`);
 
 // buildEnvironment
 const BUILD_FOLDER = path.resolve(
+  platform === 'win32' ?
+  path.join(APP_BUNDLE_FOLDER, 'resources', 'app', 'views', 'main') :
   path.join(APP_BUNDLE_FOLDER, 'Contents', 'Resources', 'app', 'views', 'main'),
 );
 
@@ -26,9 +29,7 @@ await esbuild.build({
   // outDir: path.join(appPath, "build"),
   outfile: path.join(BUILD_FOLDER, `index.js`),
   bundle: true,
-  plugins: [
-    solidPlugin(),
-  ],
+  plugins: [solidPlugin()],
   // jsx: "preserve",
   // jsxImportSource: "solid-js",
   // jsxFactory: "Solid.h", // use Solid's h function for JSX
@@ -52,7 +53,6 @@ console.log('--------> esbuild main');
 
 console.log('Compiling tailwind css for main renderer...');
 
-
 /*
 Usage:
    tailwindcss build [options]
@@ -65,10 +65,10 @@ Options:
    -h, --help               Display usage information
          */
 // path.resolve(path.join("./src", "renderers", "main", "index.tsx"));
-const cssInPath = path.join("./src/renderers", "main", "index.css");
+const cssInPath = path.join('./src/renderers', 'main', 'index.css');
 const cssOutPath = path.join(
-  BUILD_FOLDER.replace("(", "\\(").replace(")", "\\)"),
-  `tailwind.css`
+  BUILD_FOLDER.replace('(', '\\(').replace(')', '\\)'),
+  `tailwind.css`,
 );
 // const contentPath = path.join("./src/renderers", "main", "*.tsx");
 execSync(
@@ -76,6 +76,5 @@ execSync(
   {},
   // (err, stdout, stderr) => console.log("result", err, stdout, stderr)
 );
-
 
 export {};
